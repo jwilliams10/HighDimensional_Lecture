@@ -12,14 +12,10 @@ if(!("GA" %in% installed.packages())){
 if(!("memoise" %in% installed.packages())){
   install.packages("memoise")
 }
-if(!("glmnet" %in% installed.packages())){
-  install.packages("glmnet")
-}
 
 library(caret)
 library(GA)
 library(memoise)
-library(glmnet)
 
 set.seed(1330)
 
@@ -31,11 +27,17 @@ Full_Model <- lm(mpg ~ .,data = mtcars)
 ### Forward Selection with AIC
 Forward_Selection_AIC <- step(Base_Model,scope = list(lower = Base_Model,upper = Full_Model),direction = "forward",k = 2,trace = 0)
 
+Forward_Selection_AIC
+
 ### Backward Selection with AIC
 Backward_Selection_AIC <- step(Full_Model,scope = list(lower = Base_Model,upper = Full_Model),direction = "backward",k = 2,trace = 0)
 
+Backward_Selection_AIC
+
 ### Stepwise Selection with AIC
 Stepwise_Selection_AIC <- step(Base_Model,scope = list(lower = Base_Model,upper = Full_Model),direction = "both",k = 2,trace = 0)
+
+Stepwise_Selection_AIC
 
 ### Exhaustive Search with AIC
 X <- subset(mtcars, select = -mpg)
@@ -49,6 +51,8 @@ AIC_Evaluation <- function(x){
 All_AICs <- apply(All_Models,1,AIC_Evaluation)
 model_data <- mtcars[,c("mpg",colnames(X)[which(All_Models[which.min(All_AICs),] == 1)])]
 Exhaustive_Search_AIC <- lm(mpg ~ .,data = model_data)
+
+Exhaustive_Search_AIC
 
 ### Genetic Algorithm with AIC
 suggestedsol <- rbind(0,diag(ncol(X)))
@@ -64,15 +68,21 @@ Best_Solution <- ans@solution[1,]
 model_data <- mtcars[,c("mpg",colnames(X)[Best_Solution == 1])]
 Exhaustive_Search_AIC <- lm(mpg ~ .,data = model_data)
 
+Exhaustive_Search_AIC
+
 ######################## Cross-Validation
 
 ## Leave one out cross validation
 train.control <- trainControl(method = "LOOCV")
 LOOCV_Model <- train(mpg ~ ., data = mtcars, method = "lm",trControl = train.control)
 
+LOOCV_Model
+
 ## k-fold cross validation (5)
 train.control <- trainControl(method = "cv", number = 5)
 KFold_Model <- train(mpg ~ ., data = mtcars, method = "lm",trControl = train.control)
+
+KFold_Model
 
 ## k-fold cross validation by hand
 folds <- createFolds(mtcars$mpg, k = 5)
@@ -97,6 +107,8 @@ All_BICs <- apply(All_Models,1,BIC_Evaluation)
 model_data <- mtcars[,c("mpg",colnames(X)[which(All_Models[which.min(All_BICs),] == 1)])]
 Exhaustive_Search_BIC <- lm(mpg ~ .,data = model_data)
 
+Exhaustive_Search_BIC
+
 ######################## RMSE
 
 ### Exhaustive Search with RMSE on 5-fold cross-validation
@@ -116,3 +128,5 @@ CrossValidation_Evaluation <- function(x){
 All_RMSEs <- apply(All_Models,1,CrossValidation_Evaluation)
 model_data <- mtcars[,c("mpg",colnames(X)[which(All_Models[which.min(All_RMSEs),] == 1)])]
 Exhaustive_Search_CrossValidation <- lm(mpg ~ .,data = model_data)
+
+Exhaustive_Search_CrossValidation

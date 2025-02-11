@@ -1,3 +1,23 @@
+rm(list = ls())
+
+data(mtcars)
+str(mtcars)
+
+if(!("caret" %in% installed.packages())){
+  install.packages("caret")
+}
+if(!("glmnet" %in% installed.packages())){
+  install.packages("glmnet")
+}
+
+library(caret)
+library(glmnet)
+
+set.seed(1330)
+
+X <- subset(mtcars, select = -mpg)
+Y <- mtcars[,"mpg"]
+
 ######################### LASSO/Ridge 
 
 ## LASSO
